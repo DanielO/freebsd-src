@@ -270,18 +270,21 @@ p9_buf_vreadf(struct p9_buffer *buf, int proto_version, const char *fmt,
 
 			wqids = NULL;
 			error = buf_read(buf, nwqid_p, sizeof(uint16_t));
+			p9_debug(SUBR, "buf_read for nwqid_p: %d\n", error);
 			if (error != 0)
 				break;
 
 			nwqid = *nwqid_p;
+			p9_debug(SUBR, "nwqid = %d\n", nwqid);
 			wqids = malloc(nwqid * sizeof(struct p9_qid), M_TEMP, M_NOWAIT | M_ZERO);
 			if (wqids == NULL) {
 				error = ENOMEM;
 				break;
 			}
-			for (i = 0; i < nwqid && (error == 0); i++)
+			for (i = 0; i < nwqid && (error == 0); i++) {
 				error = p9_buf_readf(buf, proto_version, "Q", &(wqids)[i]);
-
+				p9_debug(SUBR, "p9_debug[%d] error %d\n", i, error);
+			}
 			if (error != 0) {
 				free(wqids, M_TEMP);
 			} else

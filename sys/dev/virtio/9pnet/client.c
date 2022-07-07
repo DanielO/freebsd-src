@@ -761,6 +761,7 @@ p9_client_walk(struct p9_fid *oldfid, uint16_t nwnames, char **wnames,
 	 */
 	req = p9_client_request(clnt, P9PROTO_TWALK, error, "ddT", oldfid->fid,
 	    fid->fid, wnames, nwnames);
+	p9_debug(SUBR, "p9_client_request error: %d\n", *error);
 	if (*error != 0) {
 		if (fid != oldfid)
 			p9_fid_destroy(fid);
@@ -769,6 +770,7 @@ p9_client_walk(struct p9_fid *oldfid, uint16_t nwnames, char **wnames,
 
 	*error = p9_buf_readf(req->rc, clnt->proto_version, "R", &nwqids,
 	    &wqids);
+	p9_debug(SUBR, "p9_buf_readf error: %d\n", *error);
 	if (*error != 0)
 		goto out;
 

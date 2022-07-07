@@ -238,11 +238,13 @@ virtfs_lookup(struct vop_lookup_args *ap)
 		return (ENOTDIR);
 
 	error = VOP_ACCESS(dvp, VEXEC, cnp->cn_cred, curthread);
+	p9_debug(VOPS, "VOP_ACCESS VEXEC error: %d\n", error);
 	if (error)
 		return (error);
 
 	/* Do the directory walk on host to check if file exist */
 	dvfid = virtfs_get_fid(vses->clnt, dnp, VFID, &error);
+	p9_debug(VOPS, "virtfs_get_fid error: %d\n", error);
 	if (error)
 		return error;
 
@@ -260,6 +262,7 @@ virtfs_lookup(struct vop_lookup_args *ap)
 	 * Create the file is the flags are set or just return the error
 	 */
 	newfid = p9_client_walk(dvfid, 1, &cnp->cn_nameptr, 1, &error);
+	p9_debug(VOPS, "p9_client_walk error: %d\n", error);
 
 	cnp->cn_nameptr[cnp->cn_namelen] = tmpchr;
 
@@ -279,6 +282,7 @@ virtfs_lookup(struct vop_lookup_args *ap)
 				return (EROFS);
 
 			error = VOP_ACCESS(dvp, VWRITE, cnp->cn_cred, curthread);
+			p9_debug(VOPS, "VOP_ACCESS VWRITE error: %d\n", error);
 			if (!error) {
 				cnp->cn_flags |= SAVENAME;
 				return (EJUSTRETURN);
@@ -289,6 +293,7 @@ virtfs_lookup(struct vop_lookup_args *ap)
 
 	/* Look for the entry in the component cache*/
 	error = cache_lookup(dvp, vpp, cnp, NULL, NULL);
+	p9_debug(VOPS, "cache_lookup error: %d\n", error);
 	if (error > 0 && error != ENOENT) {
 		p9_debug(VOPS, "Cache lookup error %d \n",error);
 		goto out;
@@ -354,6 +359,7 @@ virtfs_lookup(struct vop_lookup_args *ap)
 		/* Try to create/reuse the node */
 		error = virtfs_vget_common(mp, NULL, cnp->cn_lkflags, dnp, newfid, &vp,
 			    cnp->cn_nameptr);
+		p9_debug(VOPS, "virtfs_vget_common error: %d\n", error);
 		if (error)
 			goto out;
 		p9_debug(VOPS, "Node created OK\n");
