@@ -459,6 +459,7 @@ create_common(struct virtfs_node *dnp, struct componentname *cnp,
 
 	/* Clone the directory fid to create the new file */
 	ofid = p9_client_walk(dvfid, 0, NULL, 1, &error);
+	p9_debug(ERROR, "p9_client_walk failed: %d\n", error);
 	if (error != 0)
 		return (error);
 
