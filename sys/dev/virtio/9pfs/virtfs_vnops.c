@@ -710,7 +710,7 @@ virtfs_open(struct vop_open_args *ap)
 	/*
 	 * Always open file with RDWR permission to give permission
 	 * agnostic feeling for vp. Permission checking is done at
-	 * file descriptor level. Directories are opened RO due so
+	 * file descriptor level. Directories are opened RO so
 	 * that lib9p doesn't reject our attempt.
 	 */
 	mode = virtfs_uflags_mode(ap->a_mode, 1, vp->v_type == VDIR);
