@@ -1254,7 +1254,11 @@ fs_iopen(void *softc, struct l9p_fid *fid, int flags, enum l9p_omode p9,
 	if (S_ISDIR(first.st_mode)) {
 		/* Forbid write or truncate on directory. */
 		if ((flags & O_ACCMODE) != O_RDONLY || (flags & O_TRUNC))
+#if 0
 			return (EPERM);
+#else
+		        L9P_LOG(L9P_INFO, "Ignoring non-read only access to directory");
+#endif
 		fd = openat(file->ff_dirfd, name, O_DIRECTORY);
 		dirp = fdopendir(fd);
 		if (dirp == NULL)
