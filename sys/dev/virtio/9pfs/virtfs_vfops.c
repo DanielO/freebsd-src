@@ -480,8 +480,6 @@ virtfs_mount(struct mount *mp)
 		return (EOPNOTSUPP);
 
 	error = p9_mount(mp);
-	if (error != 0)
-		(void) virtfs_unmount(mp, MNT_FORCE);
 
 	return (error);
 }
