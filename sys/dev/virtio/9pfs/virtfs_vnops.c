@@ -618,15 +618,19 @@ virtfs_mknod(struct vop_mknod_args *ap)
 
 /* Convert open mode permissions to P9 */
 static int
-virtfs_uflags_mode(int uflags, int extended)
+virtfs_uflags_mode(int uflags, int extended, int isdir)
 {
 	uint32_t ret;
 
 	/* Convert first to O flags.*/
 	uflags = OFLAGS(uflags);
 
-	/* Always open file with RDWR permission */
-	ret = P9PROTO_ORDWR;
+	if (!isdir)
+		/* Always open file with RDWR permission */
+		ret = P9PROTO_ORDWR;
+	else
+		/* Directories are read only */
+		ret = P9PROTO_OREAD;
 
 	if (extended) {
 		if (uflags & O_EXCL)
@@ -706,9 +710,10 @@ virtfs_open(struct vop_open_args *ap)
 	/*
 	 * Always open file with RDWR permission to give permission
 	 * agnostic feeling for vp. Permission checking is done at
-	 * file descriptor level
+	 * file descriptor level. Directories are opened RO due so
+	 * that lib9p doesn't reject our attempt.
 	 */
-	mode = virtfs_uflags_mode(ap->a_mode, 1);
+	mode = virtfs_uflags_mode(ap->a_mode, 1, vp->v_type == VDIR);
 
 	error = p9_client_open(vofid, mode);
 	if (error != 0)
