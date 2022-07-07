@@ -752,6 +752,10 @@ p9_client_walk(struct p9_fid *oldfid, uint16_t nwnames, char **wnames,
 	} else
 		fid = oldfid;
 
+	if (nwnames != 0)
+		if (!strcmp(wnames[nwnames-1], "."))
+			nwnames = 0;
+
 	p9_debug(SUBR, "TWALK fids %d,%d nwnames %u wname %s\n",
 	    oldfid->fid, fid->fid, nwnames, wnames ? wnames[nwnames-1] : NULL);
 
