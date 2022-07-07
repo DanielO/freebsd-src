@@ -262,7 +262,7 @@ virtfs_lookup(struct vop_lookup_args *ap)
 	 * Create the file is the flags are set or just return the error
 	 */
 	newfid = p9_client_walk(dvfid, 1, &cnp->cn_nameptr, 1, &error);
-	p9_debug(VOPS, "p9_client_walk error: %d\n", error);
+	p9_debug(VOPS, "p9_client_walk for '%s' error: %d\n", cnp->cn_nameptr, error);
 
 	cnp->cn_nameptr[cnp->cn_namelen] = tmpchr;
 
