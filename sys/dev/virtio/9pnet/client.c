@@ -212,7 +212,7 @@ p9_client_check_return(struct p9_client *c, struct p9_req_t *req)
 {
 	int error;
 	int ecode;
-	char *ename;
+	char *ename = NULL;
 
 	/* Check what we have in the receive bufer .*/
 	error = p9_parse_receive(req->rc, c);
@@ -224,14 +224,17 @@ p9_client_check_return(struct p9_client *c, struct p9_req_t *req)
 	 * No error, We are done with the preprocessing. Return to the caller
 	 * and process the actual data.
 	 */
-	if (req->rc->id != P9PROTO_RERROR)
+	if (req->rc->id != P9PROTO_RERROR && req->rc->id != P9PROTO_RLERROR)
 		return (0);
 
 	/*
 	 * Interpreting the error is done in different ways for Linux and
 	 * Unix version. Make sure you interpret it right.
 	 */
-	error = p9_buf_readf(req->rc, c->proto_version, "s?d", &ename, &ecode);
+	if (req->rc->id == P9PROTO_RERROR)
+		error = p9_buf_readf(req->rc, c->proto_version, "s?d", &ename, &ecode);
+	else
+		error = p9_buf_readf(req->rc, c->proto_version, "d", &ecode);
 	if (error != 0) {
 		p9_debug(ERROR, "p9_buf_readf failed: %d\n", error);
 		goto out;
@@ -244,10 +247,14 @@ p9_client_check_return(struct p9_client *c, struct p9_req_t *req)
 	 * Note this is still not completely an error, as lookups for files
 	 * not present can hit this and return. Hence it is made a debug print.
 	 */
-	if (error != 0)
-		p9_debug(SUBR, "<<< RERROR (%d) %s\n", error, ename);
-
-	free(ename, M_TEMP);
+	if (error != 0) {
+		if (req->rc->id == P9PROTO_RERROR)
+			p9_debug(SUBR, "<<< RERROR (%d) %s\n", error, ename);
+		else
+			p9_debug(SUBR, "<<< RLERROR %d\n", error);
+	}
+	if (ename != NULL)
+		free(ename, M_TEMP);
 	return (error);
 
 out:
