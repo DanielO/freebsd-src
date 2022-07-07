@@ -1,0 +1,22 @@
+This is a port of the Juniper virtfs code from here:
+https://github.com/Juniper/virtfs
+
+Changes made:
+- Mechanical fixes for removed KAPI arguments.
+- Register VOP vector correctly.
+- Don't umount a failed mount, kernel does it for us.
+- Open directories as read only (lib9p returns EPERM otherwise)
+- Changed a bunch of client.c debug to differentiate it from the transport code.
+- Handled RLERROR messages.
+- Don't try and walk '.'
+
+Todo list:
+- Add proper version specification at mount time.
+- Work when mounted with 9p2000 or 9p2000u (eg no STAT/STATFS).
+- Clean up debugging cruft I added while working out how things work.
+- Split up/rearrange filesystem from transport.
+- Write Xen transport.
+
+
+Daniel O'Connor <darius@dons.net.au>
+2022/07/07
