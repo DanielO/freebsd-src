@@ -2080,8 +2080,6 @@ struct vop_vector virtfs_vnops = {
 	.vop_rename =           virtfs_rename,
 	.vop_link =		virtfs_link,
 	.vop_readlink =		virtfs_readlink,
-	.vop_lock1 =		vop_lock,
-	.vop_unlock =		vop_unlock,
-	.vop_islocked =		vop_islocked,
 };
 
+VFS_VOP_VECTOR_REGISTER(virtfs_vnops);
