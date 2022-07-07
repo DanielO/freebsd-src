@@ -752,6 +752,7 @@ p9_client_walk(struct p9_fid *oldfid, uint16_t nwnames, char **wnames,
 	} else
 		fid = oldfid;
 
+	/* Walking '.' is illegal so map it to the equivalent */
 	if (nwnames != 0)
 		if (!strcmp(wnames[nwnames-1], "."))
 			nwnames = 0;
