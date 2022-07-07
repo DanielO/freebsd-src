@@ -216,9 +216,10 @@ p9_client_check_return(struct p9_client *c, struct p9_req_t *req)
 
 	/* Check what we have in the receive bufer .*/
 	error = p9_parse_receive(req->rc, c);
-	if (error != 0)
+	if (error != 0) {
+		p9_debug(ERROR, "p9_parse_receive failed: %d\n", error);
 		goto out;
-
+	}
 	/*
 	 * No error, We are done with the preprocessing. Return to the caller
 	 * and process the actual data.
@@ -231,8 +232,10 @@ p9_client_check_return(struct p9_client *c, struct p9_req_t *req)
 	 * Unix version. Make sure you interpret it right.
 	 */
 	error = p9_buf_readf(req->rc, c->proto_version, "s?d", &ename, &ecode);
-	if (error != 0)
+	if (error != 0) {
+		p9_debug(ERROR, "p9_buf_readf failed: %d\n", error);
 		goto out;
+	}
 
 	/* if there was an ecode error make this the err now */
 	error = ecode;
@@ -341,11 +344,14 @@ p9_client_request(struct p9_client *c, int8_t type, int *error,
 
 	va_start(ap, fmt);
 	req = p9_client_prepare_req(c, type, c->msize, error, fmt, ap);
+	p9_debug(ERROR, "p9_client_prepare_req returned %p, error %d\n", req, *error);
 	va_end(ap);
 
 	/* Issue with allocation of request buffer */
-	if (*error != 0)
+	if (*error != 0) {
+		p9_debug(ERROR, "p9_client_prepare_req failed %d\n", *error);
 		return NULL;
+	}
 
 	/* Call into the transport for submission. */
 	*error = c->trans_mod->request(c, req);
@@ -359,9 +365,10 @@ p9_client_request(struct p9_client *c, int8_t type, int *error,
 	 * calling into the protocol infra to analyze the data in rc.
 	 */
 	*error = p9_client_check_return(c, req);
-	if (*error != 0)
+	if (*error != 0) {
+		p9_debug(ERROR, "p9_client_check_return failed %d\n", *error);
 		goto out;
-
+	}
 	return req;
 out:
 	p9_free_req(c, req);
@@ -1220,15 +1227,14 @@ p9_client_getattr(struct p9_fid *fid, struct p9_stat_dotl *stat_dotl,
 
 	err = 0;
 
-	p9_debug(TRANS, "TSTAT fid %d\n mask: %ju", fid->fid,
+	p9_debug(TRANS, "TSTAT fid %d mask: %ju\n", fid->fid,
 	    (uintmax_t)request_mask);
 
 	clnt = fid->clnt;
 	req = p9_client_request(clnt, P9PROTO_TGETATTR, &err, "dq", fid->fid,
 	    request_mask);
 	if (req == NULL) {
-		p9_debug(ERROR, "Request couldnt be allocated in"
-		    "client_tgetattr %d\n",err);
+		p9_debug(ERROR, "request failed: %d\n", err);
 		goto error;
 	}
 

@@ -169,7 +169,7 @@ extern int p9_debug_level; /* All debugs on now */
 
 #define p9_debug(category, fmt, ...) do {			\
 	if ((p9_debug_level & P9_DEBUG_##category) != 0)	\
-		printf(fmt, ##__VA_ARGS__);			\
+		printf("%s:" fmt, __func__, ##__VA_ARGS__); \
 } while (0)
 
 #endif /* VIRTIO_FS_CLIENT_H */
