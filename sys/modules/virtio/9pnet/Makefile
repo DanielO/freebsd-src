@@ -27,6 +27,7 @@
 .PATH: ${.CURDIR}/../../../dev/virtio/9pnet
 
 KMOD    =  virtio_9pnet
+DEBUG_FLAGS=-g
 
 # Enumerate Source files for kernel module
 SRCS    =  device_if.h bus_if.h opt_cam.h trans_virtio.c client.c protocol.c

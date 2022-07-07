@@ -27,6 +27,7 @@
 .PATH: ${.CURDIR}/../../../dev/virtio/9pfs
 
 KMOD    =  virtio_9pfs
+DEBUG_FLAGS=-g
 
 # Enumerate Source files for kernel module
 SRCS+=  virtfs_subr.c
