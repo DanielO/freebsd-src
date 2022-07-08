@@ -20,6 +20,7 @@ TESTS_SUBDIRS+=		fusefs
 .endif
 .endif
 TESTS_SUBDIRS+=		tmpfs
+TESTS_SUBDIRS+=		9pfs
 
 ${PACKAGE}FILES+=	h_funcs.subr
 ${PACKAGE}FILESDIR=	${TESTSDIR}
